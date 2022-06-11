@@ -25,26 +25,6 @@ var (
 	org = flag.String("org", "automata-devops-io", "organization to target in github")
 )
 
-// func repoList(w http.ResponseWriter, r *http.Request) {
-// 	context := context.Background()
-// 	tokenService := oauth2.StaticTokenSource(
-// 		&oauth2.Token{AccessToken: "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"},
-// 	)
-// 	tokenClient := oauth2.NewClient(context, tokenService)
-
-// 	client := github.NewClient(tokenClient)
-// 	repoOpt := &github.RepositoryListByOrgOptions{Type: "all"}
-
-// 	repoList, _, err := client.Repositories.ListByOrg(context, *org, repoOpt)
-// 	for _, repo := range repoList {
-// 		log.Printf("[DEBUG] Repo %s: %s\n", *repo.Owner.Login, *repo.Name)
-// 	}
-// 	if err != nil {
-// 		log.Printf("Problem in getting repository information %v\n", err)
-// 		os.Exit(1)
-// 	}
-// }
-
 func repoMan(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	flag.Parse()
@@ -83,13 +63,13 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 		}
 	case *github.RepositoryEvent:
 		if e.Action != nil && *e.Action == "created" {
-			// fileContent := []byte("***This is the content of my file***\n ## and the 2nd line of it")
-			// opts := &github.RepositoryContentFileOptions{
-			// 	Message:   github.String("Initial commit"),
-			// 	Content:   fileContent,
-			// 	Branch:    github.String("main"),
-			// 	Committer: &github.CommitAuthor{Name: github.String("Jeff Brimager"), Email: github.String("jbrimager@gmail.com")},
-			// }
+			fileContent := []byte("# Auto_generated_file\n ***This file was automatically created using the githubAPi and webhooks.***\n If you'd like more information on how this file was created, the api doc [here](https://docs.github.com/en/rest/repos/contents#create-a-file) ")
+			opts := &github.RepositoryContentFileOptions{
+				Message:   github.String("Initial commit"),
+				Content:   fileContent,
+				Branch:    github.String("main"),
+				Committer: &github.CommitAuthor{Name: github.String("Jeff Brimager"), Email: github.String("jbrimager@gmail.com")},
+			}
 			preq := &github.ProtectionRequest{
 				EnforceAdmins: true,
 				RequiredPullRequestReviews: &github.PullRequestReviewsEnforcementRequest{
@@ -97,11 +77,11 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 					DismissStaleReviews:          true,
 				},
 			}
-			// client.Repositories.CreateFile(ctx, *org, *e.Repo.Name, "README.md", opts)
-			// time.Sleep(5 * time.Second)
 			client.Repositories.UpdateBranchProtection(ctx, *org, *e.Repo.Name, "main", preq)
-			time.Sleep(5 * time.Second)
+			time.Sleep(2 * time.Second)
 			client.Repositories.AddAdminEnforcement(ctx, *org, *e.Repo.Name, "main")
+			time.Sleep(2 * time.Second)
+			client.Repositories.CreateFile(ctx, *org, *e.Repo.Name, "check_me_out.md", opts)
 		}
 	default:
 		log.Printf("unknown event type %s\n", github.WebHookType(r))
