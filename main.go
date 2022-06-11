@@ -15,6 +15,7 @@ import (
 
 func main() {
 	log.Println("server started")
+	http.HandleFunc("/", repoList)
 	http.HandleFunc("/webhook", repoMan)
 	log.Fatal(http.ListenAndServe(os.Getenv("PORT"), nil))
 }
@@ -22,6 +23,27 @@ func main() {
 var (
 	org = flag.String("org", "automata-devops-io", "organization to target in github")
 )
+
+func repoList(w http.ResponseWriter, r *http.Request) {
+	context := context.Background()
+	tokenService := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: "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"},
+	)
+	tokenClient := oauth2.NewClient(context, tokenService)
+
+	client := github.NewClient(tokenClient)
+	repoOpt := &github.RepositoryListByOrgOptions{Type: "all"}
+
+	repoList, _, err := client.Repositories.ListByOrg(context, *org, repoOpt)
+	for _, repo := range repoList {
+		log.Printf("[DEBUG] Repo %s: %s\n", *repo.Owner.Login, *repo.Name)
+	}
+	if err != nil {
+		log.Printf("Problem in getting repository information %v\n", err)
+		os.Exit(1)
+	}
+	return
+}
 
 func repoMan(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
@@ -34,16 +56,6 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 
 	client := github.NewClient(tokenClient)
 
-	repoOpt := &github.RepositoryListByOrgOptions{Type: "all"}
-
-	repoList, _, err := client.Repositories.ListByOrg(context, *org, repoOpt)
-	for _, repo := range repoList {
-		log.Printf("[DEBUG] Repo %s: %s\n", *repo.Owner.Login, *repo.Name)
-	}
-	if err != nil {
-		log.Printf("Problem in getting repository information %v\n", err)
-		os.Exit(1)
-	}
 	payload, err := github.ValidatePayload(r, []byte("my-secret-key"))
 	if err != nil {
 		log.Printf("error validating request body: err=%s\n", err)
