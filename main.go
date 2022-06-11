@@ -16,7 +16,7 @@ import (
 func main() {
 	port := os.Getenv("PORT")
 	log.Println("server started")
-	http.HandleFunc("", repoMan)
+	http.HandleFunc("/test", repoMan)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
