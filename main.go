@@ -99,8 +99,8 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 				},
 			}
 			client.Repositories.CreateFile(ctx, "automata-devops-io", *e.Repo.Name, "test.md", opts)
-			client.Repositories.UpdateBranchProtection(ctx, *e.Org.Name, *e.Repo.Name, "main", preq)
-			client.Repositories.AddAdminEnforcement(ctx, *e.Org.Name, *e.Repo.Name, "main")
+			client.Repositories.UpdateBranchProtection(ctx, "automata-devops-io", *e.Repo.Name, "main", preq)
+			client.Repositories.AddAdminEnforcement(ctx, "automata-devops-io", *e.Repo.Name, "main")
 		}
 	default:
 		log.Printf("unknown event type %s\n", github.WebHookType(r))
