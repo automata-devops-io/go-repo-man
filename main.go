@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -81,7 +82,7 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 		}
 	case *github.RepositoryEvent:
 		if e.Action != nil && *e.Action == "created" {
-			fileContent := []byte("This is the content of my file\nand the 2nd line of it")
+			fileContent := []byte("***This is the content of my file***\n ## and the 2nd line of it")
 			opts := &github.RepositoryContentFileOptions{
 				Message:   github.String("Initial commit"),
 				Content:   fileContent,
@@ -90,16 +91,18 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 			}
 			preq := &github.ProtectionRequest{
 				EnforceAdmins: true,
-				Restrictions:  nil,
 				RequiredPullRequestReviews: &github.PullRequestReviewsEnforcementRequest{
 					RequiredApprovingReviewCount: 2,
+					DismissStaleReviews:          true,
 				},
 				RequiredStatusChecks: &github.RequiredStatusChecks{
-					Strict: true,
+					Strict: false,
 				},
 			}
-			client.Repositories.CreateFile(ctx, "automata-devops-io", *e.Repo.Name, "test.md", opts)
+			client.Repositories.CreateFile(ctx, "automata-devops-io", *e.Repo.Name, "README.md", opts)
+			time.Sleep(5 * time.Second)
 			client.Repositories.UpdateBranchProtection(ctx, "automata-devops-io", *e.Repo.Name, "main", preq)
+			time.Sleep(5 * time.Second)
 			client.Repositories.AddAdminEnforcement(ctx, "automata-devops-io", *e.Repo.Name, "main")
 		}
 	default:
