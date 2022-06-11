@@ -83,25 +83,22 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 		}
 	case *github.RepositoryEvent:
 		if e.Action != nil && *e.Action == "created" {
-			fileContent := []byte("***This is the content of my file***\n ## and the 2nd line of it")
-			opts := &github.RepositoryContentFileOptions{
-				Message:   github.String("Initial commit"),
-				Content:   fileContent,
-				Branch:    github.String("main"),
-				Committer: &github.CommitAuthor{Name: github.String("Jeff Brimager"), Email: github.String("jbrimager@gmail.com")},
-			}
+			// fileContent := []byte("***This is the content of my file***\n ## and the 2nd line of it")
+			// opts := &github.RepositoryContentFileOptions{
+			// 	Message:   github.String("Initial commit"),
+			// 	Content:   fileContent,
+			// 	Branch:    github.String("main"),
+			// 	Committer: &github.CommitAuthor{Name: github.String("Jeff Brimager"), Email: github.String("jbrimager@gmail.com")},
+			// }
 			preq := &github.ProtectionRequest{
 				EnforceAdmins: true,
 				RequiredPullRequestReviews: &github.PullRequestReviewsEnforcementRequest{
 					RequiredApprovingReviewCount: 2,
 					DismissStaleReviews:          true,
 				},
-				RequiredStatusChecks: &github.RequiredStatusChecks{
-					Strict: false,
-				},
 			}
-			client.Repositories.CreateFile(ctx, *org, *e.Repo.Name, "README.md", opts)
-			time.Sleep(5 * time.Second)
+			// client.Repositories.CreateFile(ctx, *org, *e.Repo.Name, "README.md", opts)
+			// time.Sleep(5 * time.Second)
 			client.Repositories.UpdateBranchProtection(ctx, *org, *e.Repo.Name, "main", preq)
 			time.Sleep(5 * time.Second)
 			client.Repositories.AddAdminEnforcement(ctx, *org, *e.Repo.Name, "main")
