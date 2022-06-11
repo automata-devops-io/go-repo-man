@@ -16,7 +16,7 @@ import (
 func main() {
 	log.Println("server started")
 	http.HandleFunc("/webhook", repoMan)
-	log.Fatal(http.ListenAndServe(":3000", nil))
+	log.Fatal(http.ListenAndServe(os.Getenv("PORT"), nil))
 }
 
 var (
@@ -78,7 +78,18 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 				Branch:    github.String("main"),
 				Committer: &github.CommitAuthor{Name: github.String("Jeff Brimager"), Email: github.String("jbrimager@gmail.com")},
 			}
+			preq := &github.ProtectionRequest{
+				EnforceAdmins: true,
+				Restrictions:  nil,
+				RequiredPullRequestReviews: &github.PullRequestReviewsEnforcementRequest{
+					RequiredApprovingReviewCount: 2,
+				},
+				RequiredStatusChecks: &github.RequiredStatusChecks{
+					Strict: true,
+				},
+			}
 			client.Repositories.CreateFile(ctx, *e.Org.Name, *e.Repo.Name, "README.md", opts)
+			client.Repositories.UpdateBranchProtection(ctx, *e.Org.Name, *e.Repo.Name, "main", preq)
 			client.Repositories.AddAdminEnforcement(ctx, *e.Org.Name, *e.Repo.Name, "main")
 		}
 	default:
