@@ -56,7 +56,7 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 
 	client := github.NewClient(tokenClient)
 
-	payload, err := github.ValidatePayload(r, []byte("my-secret-key"))
+	payload, err := github.ValidatePayload(r, []byte("0d2aed9c2cf2ca01d2660d3723d89f07c94f9f8e"))
 	if err != nil {
 		log.Printf("error validating request body: err=%s\n", err)
 		return
