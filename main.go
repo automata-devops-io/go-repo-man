@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -20,9 +21,9 @@ func main() {
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
-// var (
-// 	org = flag.String("org", "automata-devops-io", "organization to target in github")
-// )
+var (
+	org = flag.String("org", "automata-devops-io", "organization to target in github")
+)
 
 // func repoList(w http.ResponseWriter, r *http.Request) {
 // 	context := context.Background()
@@ -46,7 +47,7 @@ func main() {
 
 func repoMan(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
-	// flag.Parse()
+	flag.Parse()
 	context := context.Background()
 	tokenService := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: "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"},
@@ -99,11 +100,11 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 					Strict: false,
 				},
 			}
-			client.Repositories.CreateFile(ctx, "automata-devops-io", *e.Repo.Name, "README.md", opts)
+			client.Repositories.CreateFile(ctx, *org, *e.Repo.Name, "README.md", opts)
 			time.Sleep(5 * time.Second)
-			client.Repositories.UpdateBranchProtection(ctx, "automata-devops-io", *e.Repo.Name, "main", preq)
+			client.Repositories.UpdateBranchProtection(ctx, *org, *e.Repo.Name, "main", preq)
 			time.Sleep(5 * time.Second)
-			client.Repositories.AddAdminEnforcement(ctx, "automata-devops-io", *e.Repo.Name, "main")
+			client.Repositories.AddAdminEnforcement(ctx, *org, *e.Repo.Name, "main")
 		}
 	default:
 		log.Printf("unknown event type %s\n", github.WebHookType(r))
