@@ -14,10 +14,11 @@ import (
 )
 
 func main() {
+	port := os.Getenv("PORT")
 	log.Println("server started")
 	http.HandleFunc("/", repoList)
 	http.HandleFunc("/webhook", repoMan)
-	log.Fatal(http.ListenAndServe(os.Getenv("PORT"), nil))
+	log.Fatal(http.ListenAndServe(port, nil))
 }
 
 var (
