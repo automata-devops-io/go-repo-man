@@ -99,7 +99,7 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 					Strict: true,
 				},
 			}
-			client.Repositories.CreateFile(ctx, *e.Org.Name, *e.Repo.Name, "README.md", opts)
+			client.Repositories.CreateFile(ctx, *e.Org.Name, *e.Repo.Name, "test.md", opts)
 			client.Repositories.UpdateBranchProtection(ctx, *e.Org.Name, *e.Repo.Name, "main", preq)
 			client.Repositories.AddAdminEnforcement(ctx, *e.Org.Name, *e.Repo.Name, "main")
 		}
