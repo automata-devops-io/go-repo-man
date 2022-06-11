@@ -64,11 +64,9 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 	case *github.RepositoryEvent:
 		if e.Action != nil && *e.Action == "created" {
 			fileContent := []byte("# Auto_generated_file\n ***This file was automatically created using the githubAPi and webhooks.***\n If you'd like more information on how this file was created, the api doc [here](https://docs.github.com/en/rest/repos/contents#create-a-file) ")
-			opts := &github.RepositoryContentFileOptions{
-				Message:   github.String("Initial commit"),
-				Content:   fileContent,
-				Branch:    github.String("main"),
-				Committer: &github.CommitAuthor{Name: github.String("Jeff Brimager"), Email: github.String("jbrimager@gmail.com")},
+			issue := &github.IssueRequest{
+				Title: github.String("New repo Created"),
+				Body:  github.String("@sam1el this repo was created"),
 			}
 			preq := &github.ProtectionRequest{
 				EnforceAdmins: true,
@@ -81,7 +79,7 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 			time.Sleep(2 * time.Second)
 			client.Repositories.AddAdminEnforcement(ctx, *org, *e.Repo.Name, "main")
 			time.Sleep(2 * time.Second)
-			client.Repositories.CreateFile(ctx, *org, *e.Repo.Name, "check_me_out.md", opts)
+			client.Issues.Create(ctx, *org, *e.Repo.Name, issue)
 		}
 	default:
 		log.Printf("unknown event type %s\n", github.WebHookType(r))
