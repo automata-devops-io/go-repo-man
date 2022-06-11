@@ -63,7 +63,6 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 		}
 	case *github.RepositoryEvent:
 		if e.Action != nil && *e.Action == "created" {
-			fileContent := []byte("# Auto_generated_file\n ***This file was automatically created using the githubAPi and webhooks.***\n If you'd like more information on how this file was created, the api doc [here](https://docs.github.com/en/rest/repos/contents#create-a-file) ")
 			issue := &github.IssueRequest{
 				Title: github.String("New repo Created"),
 				Body:  github.String("@sam1el this repo was created"),
