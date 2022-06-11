@@ -19,7 +19,7 @@ func main() {
 	http.Get("/")
 	http.HandleFunc("/", repoList)
 	http.HandleFunc("/webhook", repoMan)
-	log.Fatal(http.ListenAndServe(port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
 var (
