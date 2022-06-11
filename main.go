@@ -42,7 +42,6 @@ func repoList(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Problem in getting repository information %v\n", err)
 		os.Exit(1)
 	}
-	return
 }
 
 func repoMan(w http.ResponseWriter, r *http.Request) {
