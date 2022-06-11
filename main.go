@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -46,7 +45,7 @@ func main() {
 
 func repoMan(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
-	flag.Parse()
+	// flag.Parse()
 	context := context.Background()
 	tokenService := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: "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"},
