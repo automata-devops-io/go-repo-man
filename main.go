@@ -14,7 +14,7 @@ import (
 
 func main() {
 	port := os.Getenv("PORT")
-	log.Println("server started")
+	log.Info("server started")
 	http.HandleFunc("/test", repoMan)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
@@ -38,14 +38,14 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 
 	payload, err := github.ValidatePayload(r, []byte(whsecret))
 	if err != nil {
-		log.Printf("error validating request body: err=%s\n", err)
+		log.Error("error validating request body: err=%s\n", err)
 		return
 	}
 	defer r.Body.Close()
 
 	event, err := github.ParseWebHook(github.WebHookType(r), payload)
 	if err != nil {
-		log.Printf("could not parse webhook: err=%s\n", err)
+		log.Error("could not parse webhook: err=%s\n", err)
 		return
 	}
 
@@ -60,7 +60,7 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 		// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#watch
 		// someone starred our repository
 		if e.Action != nil && *e.Action == "starred" {
-			log.Printf("%s starred repository %s\n",
+			log.Info("%s starred repository %s\n",
 				*e.Sender.Login, *e.Repo.FullName)
 		}
 	case *github.RepositoryEvent:
@@ -68,7 +68,7 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 		// this is a repository event
 		// this is where we manage the security settings
 		if e.Action != nil && *e.Action == "created" {
-			log.Printf("%s new repository created. configuring security %s\n")
+			log.Info("new repository created. configuring security %s\n")
 			opt := &github.RepositoryContentFileOptions{
 				Message:   github.String("initial commit"),
 				Content:   []byte(*github.String("# " + *e.Repo.Name)),
@@ -77,7 +77,7 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 			}
 			issue := &github.IssueRequest{
 				Title:    github.String("New repo Created"),
-				Body:     github.String("@sam1el this repo was created"),
+				Body:     github.String("@sam1el this repo was created with the following rules applied\n - Require Pull Request Review\n - Requires 2 Approvers\n - Dismiss Stale Reviews\n Require CodeOwner Review"),
 				Assignee: github.String("sam1el"),
 			}
 			preq := &github.ProtectionRequest{
