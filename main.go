@@ -69,6 +69,12 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 		// this is where we manage the security settings
 		if e.Action != nil && *e.Action == "created" {
 			log.Printf("%s new repository created. configuring security %s\n")
+			opt := &github.RepositoryContentFileOptions{
+				Message:   github.String("initial commit"),
+				Content:   []byte(*github.String("# " + *e.Repo.Name)),
+				Branch:    github.String("main"),
+				Committer: &github.CommitAuthor{Name: github.String("Jeff Brimager"), Email: github.String("jbrimager@automata-devops.io")},
+			}
 			issue := &github.IssueRequest{
 				Title:    github.String("New repo Created"),
 				Body:     github.String("@sam1el this repo was created"),
@@ -82,6 +88,7 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 					RequireCodeOwnerReviews:      true,
 				},
 			}
+			client.Repositories.CreateFile(ctx, *org, *e.Repo.Name, "README.md", opt)
 			client.Repositories.UpdateBranchProtection(ctx, *org, *e.Repo.Name, "main", preq)
 			client.Repositories.AddAdminEnforcement(ctx, *org, *e.Repo.Name, "main")
 			client.Issues.Create(ctx, *org, *e.Repo.Name, issue)
