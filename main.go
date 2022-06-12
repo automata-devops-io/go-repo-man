@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"flag"
 	"net/http"
 	"os"
 
@@ -19,15 +19,15 @@ func main() {
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
-// var (
-// 	// org name will be a
-// 	org = flag.String("org", "automata-devops-io", "organization to target in github")
-// )
+var (
+	org = flag.String("org", "automata-devops-io", "organization to target in github")
+)
 
 func repoMan(w http.ResponseWriter, r *http.Request) {
 	ghtoken := os.Getenv("GHTOKEN")
 	whsecret := os.Getenv("WHSECRET")
 	ctx := context.Background()
+	// flag.Parse()
 	context := context.Background()
 	tokenService := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: ghtoken},
@@ -51,19 +51,24 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 
 	switch e := event.(type) {
 	case *github.PushEvent:
+		// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
 		// this is a commit push, do something with it
 	case *github.PullRequestEvent:
+		// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
 		// this is a pull request, do something with it
 	case *github.WatchEvent:
-		// https://developer.github.com/v3/activity/events/types/#watchevent
+		// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#watch
 		// someone starred our repository
 		if e.Action != nil && *e.Action == "starred" {
-			fmt.Printf("%s starred repository %s\n",
+			log.Printf("%s starred repository %s\n",
 				*e.Sender.Login, *e.Repo.FullName)
 		}
-		// this is for setting up Repo security
 	case *github.RepositoryEvent:
+		//https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
+		// this is a repository event
+		// this is where we manage the security settings
 		if e.Action != nil && *e.Action == "created" {
+			log.Printf("%s new repository created. configuring security %s\n")
 			issue := &github.IssueRequest{
 				Title:    github.String("New repo Created"),
 				Body:     github.String("@sam1el this repo was created"),
@@ -77,9 +82,9 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 					RequireCodeOwnerReviews:      true,
 				},
 			}
-			client.Repositories.UpdateBranchProtection(ctx, *e.Org.Name, *e.Repo.Name, "main", preq)
-			client.Repositories.AddAdminEnforcement(ctx, *e.Org.Name, *e.Repo.Name, "main")
-			client.Issues.Create(ctx, *e.Org.Name, *e.Repo.Name, issue)
+			client.Repositories.UpdateBranchProtection(ctx, *org, *e.Repo.Name, "main", preq)
+			client.Repositories.AddAdminEnforcement(ctx, *org, *e.Repo.Name, "main")
+			client.Issues.Create(ctx, *org, *e.Repo.Name, issue)
 		}
 	default:
 		log.Printf("unknown event type %s\n", github.WebHookType(r))
