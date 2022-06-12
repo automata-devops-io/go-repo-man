@@ -93,29 +93,29 @@ flowchart TD;
   Finally, this section is a portion of the decision engine that sends instructions to the GitHub API. For more information on how this library works with the API see [here](https://pkg.go.dev/github.com/google/go-github@v17.0.0+incompatible/github#RepositoriesService.UpdateBranchProtection)
 
   ```go
-  	case *github.RepositoryEvent:
-		//https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
-		// this is a repository event
-		// this is where we manage the security settings
-		if e.Action != nil && *e.Action == "created" {
-			log.Printf("%s new repository created. configuring security %s\n")
-			issue := &github.IssueRequest{
-				Title:    github.String("New repo Created"),
-				Body:     github.String("@sam1el this repo was created"),
-				Assignee: github.String("sam1el"),
-			}
-			preq := &github.ProtectionRequest{
-				EnforceAdmins: true,
-				RequiredPullRequestReviews: &github.PullRequestReviewsEnforcementRequest{
-					RequiredApprovingReviewCount: 2,
-					DismissStaleReviews:          true,
-					RequireCodeOwnerReviews:      true,
-				},
-			}
-			client.Repositories.UpdateBranchProtection(ctx, *org, *e.Repo.Name, "main", preq)
-			client.Repositories.AddAdminEnforcement(ctx, *org, *e.Repo.Name, "main")
-			client.Issues.Create(ctx, *org, *e.Repo.Name, issue)
-		}
+  case *github.RepositoryEvent:
+	//https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
+	// this is a repository event
+	// this is where we manage the security settings
+	if e.Action != nil && *e.Action == "created" {
+	log.Printf("%s new repository created. configuring security %s\n")
+	issue := &github.IssueRequest{
+		Title:    github.String("New repo Created"),
+		Body:     github.String("@sam1el this repo was created"),
+		Assignee: github.String("sam1el"),
+	}
+	preq := &github.ProtectionRequest{
+		EnforceAdmins: true,
+		RequiredPullRequestReviews: &github.PullRequestReviewsEnforcementRequest{
+			RequiredApprovingReviewCount: 2,
+			DismissStaleReviews:          true,
+			RequireCodeOwnerReviews:      true,
+		},
+	}
+	client.Repositories.UpdateBranchProtection(ctx, *org, *e.Repo.Name, "main", preq)
+	client.Repositories.AddAdminEnforcement(ctx, *org, *e.Repo.Name, "main")
+	client.Issues.Create(ctx, *org, *e.Repo.Name, issue)
+	}
     ```
 
 - You will need the folliwng environment variables in heroku:
