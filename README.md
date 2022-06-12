@@ -39,7 +39,9 @@ flowchart TD;
 #### Microservices
 
 - `main.go`: All functional logic is contained in this file.
+
   - The `main` function creates our listening service using go's builtin `net/http` libraries with a function handler to communicate with the `go-github` library.
+
   ```go
   func main() {
 	port := os.Getenv("PORT")
@@ -48,11 +50,11 @@ flowchart TD;
 	log.Fatal(http.ListenAndServe(":"+port, nil))
   }
   ```
+
   - the `repoMan` function parses the payload from our GitHub webhook, validates the type of event and, sends instructions back to the Github API based on the event type.
 
-  The first part handles client connection
+  The first section handles client connection
   ```go
-  // This portion handles the client connection
   func repoMan(w http.ResponseWriter, r *http.Request) {
 	ghtoken := os.Getenv("GHTOKEN")
 	whsecret := os.Getenv("WHSECRET")
@@ -68,6 +70,7 @@ flowchart TD;
   ```
 
   This section handles payload verification and and parses the events
+
   ```go
   	payload, err := github.ValidatePayload(r, []byte(whsecret))
 	if err != nil {
