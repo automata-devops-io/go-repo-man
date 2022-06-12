@@ -2,11 +2,9 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"net/http"
 	"os"
-	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -21,22 +19,24 @@ func main() {
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
-var (
-	org = flag.String("org", "automata-devops-io", "organization to target in github")
-)
+// var (
+// 	// org name will be a
+// 	org = flag.String("org", "automata-devops-io", "organization to target in github")
+// )
 
 func repoMan(w http.ResponseWriter, r *http.Request) {
+	ghtoken := os.Getenv("GHTOKEN")
+	whsecret := os.Getenv("WHSECRET")
 	ctx := context.Background()
-	flag.Parse()
 	context := context.Background()
 	tokenService := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: "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"},
+		&oauth2.Token{AccessToken: ghtoken},
 	)
 	tokenClient := oauth2.NewClient(context, tokenService)
 
 	client := github.NewClient(tokenClient)
 
-	payload, err := github.ValidatePayload(r, []byte("0d2aed9c2cf2ca01d2660d3723d89f07c94f9f8e"))
+	payload, err := github.ValidatePayload(r, []byte(whsecret))
 	if err != nil {
 		log.Printf("error validating request body: err=%s\n", err)
 		return
@@ -61,24 +61,25 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("%s starred repository %s\n",
 				*e.Sender.Login, *e.Repo.FullName)
 		}
+		// this is for setting up Repo security
 	case *github.RepositoryEvent:
 		if e.Action != nil && *e.Action == "created" {
 			issue := &github.IssueRequest{
-				Title: github.String("New repo Created"),
-				Body:  github.String("@sam1el this repo was created"),
+				Title:    github.String("New repo Created"),
+				Body:     github.String("@sam1el this repo was created"),
+				Assignee: github.String("sam1el"),
 			}
 			preq := &github.ProtectionRequest{
 				EnforceAdmins: true,
 				RequiredPullRequestReviews: &github.PullRequestReviewsEnforcementRequest{
 					RequiredApprovingReviewCount: 2,
 					DismissStaleReviews:          true,
+					RequireCodeOwnerReviews:      true,
 				},
 			}
-			client.Repositories.UpdateBranchProtection(ctx, *org, *e.Repo.Name, "main", preq)
-			time.Sleep(2 * time.Second)
-			client.Repositories.AddAdminEnforcement(ctx, *org, *e.Repo.Name, "main")
-			time.Sleep(2 * time.Second)
-			client.Issues.Create(ctx, *org, *e.Repo.Name, issue)
+			client.Repositories.UpdateBranchProtection(ctx, *e.Org.Name, *e.Repo.Name, "main", preq)
+			client.Repositories.AddAdminEnforcement(ctx, *e.Org.Name, *e.Repo.Name, "main")
+			client.Issues.Create(ctx, *e.Org.Name, *e.Repo.Name, issue)
 		}
 	default:
 		log.Printf("unknown event type %s\n", github.WebHookType(r))
