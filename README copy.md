@@ -9,13 +9,6 @@
   + [What's Needed?](#whats-needed)
   + [Getting Started](#getting-started)
     + [Microservices](#microservices)
-      <!-- + [Components - Standalone Web Application](#components---standalone-web-application) -->
-      <!-- + [Getting Started - Standalone Web Application](#getting-started---standalone-web-application) -->
-      <!-- + [Deploy Web App - Standalone Web Application](#deploy-web-app---standalone-web-application) -->
-      <!-- + [Setting up the GitHub Organization Webhook - Standalone Web Application](#setting-up-the-github-organization-webhook---standalone-web-application) -->
-    <!-- + [Usage - Repository Dispatch](#usage---repository-dispatch) -->
-  <!-- + [References](#references) -->
-  <!-- + [TODO](#todo) -->
 
 ## Summary
 
