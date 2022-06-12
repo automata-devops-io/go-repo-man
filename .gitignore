@@ -2,7 +2,8 @@
 # vendor/
 .env
 .gitattributes
-
+.vscode
+.editorconfig
 # Created by https://www.toptal.com/developers/gitignore/api/macos,windows,go,executable
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,windows,go,executable
 
