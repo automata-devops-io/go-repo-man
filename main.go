@@ -77,7 +77,7 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 			}
 			issue := &github.IssueRequest{
 				Title:    github.String("New repo Created"),
-				Body:     github.String("@sam1el this repo was created with the following rules applied\n - Require Pull Request Review\n - Requires 2 Approvers\n - Dismiss Stale Reviews\n Require CodeOwner Review"),
+				Body:     github.String("@sam1el this repo was created with the following rules applied\n - Require Pull Request Review\n - Requires 2 Approvers\n - Dismiss Stale Reviews\n - Require CodeOwner Review"),
 				Assignee: github.String("sam1el"),
 			}
 			preq := &github.ProtectionRequest{

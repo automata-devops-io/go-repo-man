@@ -1,7 +1,7 @@
 # go-repo-man
 ***A settings manager for GitHub repositories***
 
-**Note**:  The code in this repository shows one of many ways to manage your repo security. It is not intended to be used outside of a development environment. Do so at your own risk.
+**Note**:  The code in this repository show one of many ways to manage your repo security. It is not intended to be used outside of a development environment. Do so at your own risk.
 
 ## Table of contents
 
@@ -39,9 +39,7 @@ flowchart TD;
 #### Microservices
 
 - `main.go`: All functional logic is contained in this file.
-
   - The `main` function creates our listening service using go's builtin `net/http` libraries with a function handler to communicate with the `go-github` library.
-
   ```go
   func main() {
 	port := os.Getenv("PORT")
@@ -50,11 +48,11 @@ flowchart TD;
 	log.Fatal(http.ListenAndServe(":"+port, nil))
   }
   ```
-
   - the `repoMan` function parses the payload from our GitHub webhook, validates the type of event and, sends instructions back to the Github API based on the event type.
 
-  The first section handles client connection
+  The first part handles client connection
   ```go
+  // This portion handles the client connection
   func repoMan(w http.ResponseWriter, r *http.Request) {
 	ghtoken := os.Getenv("GHTOKEN")
 	whsecret := os.Getenv("WHSECRET")
@@ -70,7 +68,6 @@ flowchart TD;
   ```
 
   This section handles payload verification and and parses the events
-
   ```go
   	payload, err := github.ValidatePayload(r, []byte(whsecret))
 	if err != nil {
@@ -89,36 +86,29 @@ flowchart TD;
   Finally, this section is a portion of the decision engine that sends instructions to the GitHub API. For more information on how this library works with the API see [here](https://pkg.go.dev/github.com/google/go-github@v17.0.0+incompatible/github#RepositoriesService.UpdateBranchProtection)
 
   ```go
-	case *github.RepositoryEvent:
-		//https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
-		// this is a repository event
-		// this is where we manage the security settings
-		if e.Action != nil && *e.Action == "created" {
-			log.Info("new repository created. configuring security %s\n")
-			opt := &github.RepositoryContentFileOptions{
-				Message:   github.String("initial commit"),
-				Content:   []byte(*github.String("# " + *e.Repo.Name)),
-				Branch:    github.String("main"),
-				Committer: &github.CommitAuthor{Name: github.String("Jeff Brimager"), Email: github.String("jbrimager@automata-devops.io")},
-			}
-			issue := &github.IssueRequest{
-				Title:    github.String("New repo Created"),
-				Body:     github.String("@sam1el this repo was created with the following rules applied\n - Require Pull Request Review\n - Requires 2 Approvers\n - Dismiss Stale Reviews\n - Require CodeOwner Review"),
-				Assignee: github.String("sam1el"),
-			}
-			preq := &github.ProtectionRequest{
-				EnforceAdmins: true,
-				RequiredPullRequestReviews: &github.PullRequestReviewsEnforcementRequest{
-					RequiredApprovingReviewCount: 2,
-					DismissStaleReviews:          true,
-					RequireCodeOwnerReviews:      true,
-				},
-			}
-			client.Repositories.CreateFile(ctx, *org, *e.Repo.Name, "README.md", opt)
-			client.Repositories.UpdateBranchProtection(ctx, *org, *e.Repo.Name, "main", preq)
-			client.Repositories.AddAdminEnforcement(ctx, *org, *e.Repo.Name, "main")
-			client.Issues.Create(ctx, *org, *e.Repo.Name, issue)
-		}
+  case *github.RepositoryEvent:
+	//https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#repository
+	// this is a repository event
+	// this is where we manage the security settings
+	if e.Action != nil && *e.Action == "created" {
+	log.Printf("%s new repository created. configuring security %s\n")
+	issue := &github.IssueRequest{
+		Title:    github.String("New repo Created"),
+		Body:     github.String("@sam1el this repo was created"),
+		Assignee: github.String("sam1el"),
+	}
+	preq := &github.ProtectionRequest{
+		EnforceAdmins: true,
+		RequiredPullRequestReviews: &github.PullRequestReviewsEnforcementRequest{
+			RequiredApprovingReviewCount: 2,
+			DismissStaleReviews:          true,
+			RequireCodeOwnerReviews:      true,
+		},
+	}
+	client.Repositories.UpdateBranchProtection(ctx, *org, *e.Repo.Name, "main", preq)
+	client.Repositories.AddAdminEnforcement(ctx, *org, *e.Repo.Name, "main")
+	client.Issues.Create(ctx, *org, *e.Repo.Name, issue)
+	}
     ```
 
 - You will need the folliwng environment variables in heroku:
