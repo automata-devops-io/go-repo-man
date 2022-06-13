@@ -173,7 +173,7 @@ Now we're going run this locally and do some testing to make sure our microservi
 - Set up our local variables
 	```shell
 	export PORT="3000"
-	export GHTOKEN="ghp_MYTOKENISCOLLERTHANYOURS"
+	export GHTOKEN="ghp_MYTOKENISCOOLERTHANYOURS"
 	export WHSECRET="YOUSHOULDSEEMYSECRETTHO"
 	```
 
