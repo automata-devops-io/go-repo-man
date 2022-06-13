@@ -8,9 +8,9 @@
 - [Summary](#summary)
   - [What's Needed?](#whats-needed)
   - [Getting Started](#getting-started)
-    - [Microservice - Structure](#microservice-structure)
-		- [Microservice - Testing](#microservice-testing)
-		- [Microservice - Let's Deploy!](#microservice-lets-deploy)
+    - [Microservice - Structure](#microservice---structure)
+	- [Microservice - Testing](#microservice---testing)
+	- [Microservice - Let's Deploy!](#microservice---lets-deploy)
 
 ## Summary
 
