@@ -5,10 +5,12 @@
 
 ## Table of contents
 
-+ [Summary](#summary)
-  + [What's Needed?](#whats-needed)
-  + [Getting Started](#getting-started)
-    + [Microservices](#microservices)
+- [Summary](#summary)
+  - [What's Needed?](#whats-needed)
+  - [Getting Started](#getting-started)
+    - [Microservice - Structure](#microservice-structure)
+		- [Microservice - Testing](#microservice-testing)
+		- [Microservice - Let's Deploy!](#microservice-lets-deploy)
 
 ## Summary
 
@@ -36,7 +38,7 @@ flowchart TD;
   C -- Update Branch protection rules --> A;
 ```
 
-#### Microservices
+#### Microservice - Structure
 
 - `main.go`: All functional logic is contained in this file.
 
@@ -122,6 +124,9 @@ flowchart TD;
     ```
 
 - You will need the folliwng environment variables in heroku:
-  - `PORT`: **required**, In heroku the app will use the default port that is set by the provider `:5000` to determine what port should be used for bind when starting the application.
+  - `PORT`: **required**, In heroku the app will use the default port that is set by the provider `:5000` to determine what port should be used for bind when starting the application. You can set this to any port you like.
   - `GHTOKEN`: **required**, This is a Personal Access Token creted in your github account. It will be use by the `go-github` client in the `repoMan` function to communicate with the Github API
   - `WHSECRET`: **required**, Used by `repoMan`, to validate the payload recieved is from our `Organizations` webhook.
+
+### Microservice - Testing
+### Microservice - Let's Deploy!
