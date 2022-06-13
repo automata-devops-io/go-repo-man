@@ -41,7 +41,7 @@ flowchart TD;
   C -- Update Branch protection rules --> A;
 ```
 
-**Note**: For this exercise will apply the following rules
+**Note**: For this exercise we will apply the following rules
 - Pull Requests require review
 - Pull Requests require 2 approvals
 - Rules are enforced for admins
