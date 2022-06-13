@@ -38,14 +38,14 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 
 	payload, err := github.ValidatePayload(r, []byte(whsecret))
 	if err != nil {
-		log.Error("error validating request body: err=%s\n", err)
+		log.Error("error validating request body: err", err)
 		return
 	}
 	defer r.Body.Close()
 
 	event, err := github.ParseWebHook(github.WebHookType(r), payload)
 	if err != nil {
-		log.Error("could not parse webhook: err=%s\n", err)
+		log.Error("could not parse webhook:", err)
 		return
 	}
 
@@ -60,7 +60,7 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 		// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#watch
 		// someone starred our repository
 		if e.Action != nil && *e.Action == "starred" {
-			log.Info("%s starred repository %s\n",
+			log.Info("starred repository",
 				*e.Sender.Login, *e.Repo.FullName)
 		}
 	case *github.RepositoryEvent:
@@ -68,7 +68,7 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 		// this is a repository event
 		// this is where we manage the security settings
 		if e.Action != nil && *e.Action == "created" {
-			log.Info("new repository created. configuring security %s\n")
+			log.Info("new repository created. configuring security")
 			opt := &github.RepositoryContentFileOptions{
 				Message:   github.String("initial commit"),
 				Content:   []byte(*github.String("# " + *e.Repo.Name)),
