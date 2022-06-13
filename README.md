@@ -280,7 +280,7 @@ Now that the webhook and microservice are communicating, successful processing o
 ### Reference Materials
 
 All reference links in 1 convenient location
-- More information on [Branch protectio rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/managing-a-branch-protection-rule)
+- More information on [Branch protection rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/managing-a-branch-protection-rule)
 - GitHub Documentation for the [API](https://docs.github.com/en/rest)
 - Usage of the [go-github library](https://github.com/google/go-github)
 - Managing branch protection with [go-github](https://pkg.go.dev/github.com/google/go-github@v17.0.0+incompatible/github#RepositoriesService.UpdateBranchProtection) (**Note**: This also provides links to the relevant portions of the GitHub API)
