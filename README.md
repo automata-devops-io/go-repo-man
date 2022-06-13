@@ -12,6 +12,8 @@
 	- [Microservice - Testing](#microservice---testing)
 	- [Microservice - Let's Deploy!](#microservice---lets-deploy)
 	- [Creating the Webhook](#creating-the-webhook)
+- [References Material](#reference-materials)
+- [What's Next](#whats-next)
 
 ## Summary
 
@@ -143,7 +145,7 @@ Now we're going run this locally and do some testing to make sure our microservi
 
 - Create a local copy of the code by cloning the repo
 	```shell
-	git clone git@github.com:automata-devops-io/go-repo-man.git
+	➜ git clone git@github.com:automata-devops-io/go-repo-man.git
 	```
 	You will have similar output to below:
 	```shell
@@ -222,7 +224,7 @@ Below is what it would look like on the heroku site.
 
 	![link to heroku build](/images/heroku-build.png)
 
-	If click the `View build log` link you are presented with the following
+	If you click the `View build log` link you are presented with the following
 	```shell
 	-----> Building on the Heroku-20 stack
 	-----> Using buildpack: heroku/go
@@ -251,3 +253,45 @@ Below is what it would look like on the heroku site.
 	```
 
 ### Creating the Webhook
+
+Now that we have the microservice deployed, we need to create the webhook to bring it all together. You can find information on creating a webhook in your organization [here](https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks)
+
+To set up your webhook you will need at minimum a `Payload URL`, `Content type` and to select your `Event types`. You can see below how it looks in Github
+
+![link to webhook creation](images/webhook-creation.png)
+
+As you can see, we have selected to have all events sent as we plant to expand upon this module but for now, you will want to select `Let me select individual events` and then check the box for `repositories`. We have also configured our webhook with a secret. This is what you will provide to the `WHSECRET` environment variable.
+
+With the webhook configured we are now ready to start sending data to our microservice for processing. Each time you create a new repo, a webhook event is triggered. If you would like to verify delivery, this can done in your organizaition as well. (See the example below or further reading can be found [here](https://docs.github.com/en/developers/webhooks-and-events/webhooks/testing-webhooks))
+
+![link webhook management](/images/webhook-mgmt.png)
+
+**THAT'S IT!!!!!**
+
+Now that the webhook and microservice are communicating, successful processing of repository events should result in the following.
+
+- `Main` branch created
+- `README.md` created with the repo name as the title
+- `Branch protection rules` being enforced
+- `Issue` created notifying you of rule enforcement with a list of the rules.
+- `Issue` assigned to someone for review
+	![link to issue](/images/gh-issue.png)
+
+### Reference Materials
+
+All reference links in 1 convenient location
+- More information on [Branch protectio rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/managing-a-branch-protection-rule)
+- GitHub Documentation for the [API](https://docs.github.com/en/rest)
+- Usage of the [go-github library](https://github.com/google/go-github)
+- Managing branch protection with [go-github](https://pkg.go.dev/github.com/google/go-github@v17.0.0+incompatible/github#RepositoriesService.UpdateBranchProtection) (**Note**: This also provides links to the relevant portions of the GitHub API)
+- Accepting Github Webhooks with GO [tutorial](https://groob.io/tutorial/go-github-webhook/)
+
+
+### What's Next?
+
+There are some more functions I would like to add to make this a more robust solution.
+
+- Another api endpoint in the microservice to apply the rules to preexisting repositories
+- Handling of Pull Request events (Assigning users by default)
+- Adding more default files to repository creation for pipeline management
+- Write proper go testing for the api
