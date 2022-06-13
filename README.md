@@ -134,7 +134,7 @@ We will also be creating the `main` branch and `Readme.md` as will as creating a
 		}
     ```
 
-- You will need the folliwng environment variables in heroku:
+- You will need the follwing environment variables in heroku:
   - `PORT`: **required**, In heroku the app will use the default port that is set by the provider `:5000` to determine what port should be used for bind when starting the application. You can set this to any port you like.
   - `GHTOKEN`: **required**, This is a Personal Access Token creted in your github account. It will be use by the `go-github` client in the `repoMan` function to communicate with the Github API
   - `WHSECRET`: **required**, Used by `repoMan`, to validate the payload recieved is from our `Organizations` webhook.
