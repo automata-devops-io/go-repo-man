@@ -47,7 +47,7 @@ flowchart TD;
 - Rules are enforced for admins
 - Require Code owner review
 
-We will also be creating the `main` branch and `Readme.md` as will as creating an issue to notify us that the rules were enforced
+We will also be creating the `main` branch and `Readme.md` as well as creating an issue to notify us that the rules were enforced
 
 #### Microservice - Structure
 
