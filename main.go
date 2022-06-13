@@ -92,6 +92,7 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 			client.Repositories.UpdateBranchProtection(ctx, *org, *e.Repo.Name, "main", preq)
 			client.Repositories.AddAdminEnforcement(ctx, *org, *e.Repo.Name, "main")
 			client.Issues.Create(ctx, *org, *e.Repo.Name, issue)
+			return
 		}
 	default:
 		log.Printf("unknown event type %s\n", github.WebHookType(r))

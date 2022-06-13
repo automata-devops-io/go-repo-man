@@ -11,6 +11,7 @@
     - [Microservice - Structure](#microservice---structure)
 	- [Microservice - Testing](#microservice---testing)
 	- [Microservice - Let's Deploy!](#microservice---lets-deploy)
+	- [Creating the Webhook](#creating-the-webhook)
 
 ## Summary
 
@@ -29,7 +30,7 @@ For this project we are using a **GoLang** microservice as a notification ingres
 
 ## Getting Started
 
-Once compiled, the code in this repository run as a standalone microservice to ingest, validate and act upon webhook events from a GitHub organization. This will apply default configurations to all newly created repositories and their default branch.
+Once compiled, the code in this repository runs as a standalone microservice to ingest, validate, and act upon webhook events from a GitHub organization. This will apply default configurations to all newly created repositories and their default branch.
 
 ```mermaid
 flowchart TD;
@@ -37,6 +38,14 @@ flowchart TD;
   B[webhook] --> C[repoMan];
   C -- Update Branch protection rules --> A;
 ```
+
+**Note**: For this exercise will apply the following rules
+- Pull Requests require review
+- Pull Requests require 2 approvals
+- Rules are enforced for admins
+- Require Code owner review
+
+We will also be creating the `main` branch and `Readme.md` as will as creating an issue to notify us that the rules were enforced
 
 #### Microservice - Structure
 
@@ -129,4 +138,116 @@ flowchart TD;
   - `WHSECRET`: **required**, Used by `repoMan`, to validate the payload recieved is from our `Organizations` webhook.
 
 ### Microservice - Testing
+
+Now we're going run this locally and do some testing to make sure our microservice is running as expected. First, lets make sure we have [what's needed](#whats-needed)
+
+- Create a local copy of the code by cloning the repo
+	```shell
+	git clone git@github.com:automata-devops-io/go-repo-man.git
+	```
+	You will have similar output to below:
+	```shell
+	➜ git clone git@github.com:automata-devops-io/go-repo-man.git
+		Cloning into 'go-repo-man'...
+		remote: Enumerating objects: 135, done.
+		remote: Counting objects: 100% (135/135), done.
+		remote: Compressing objects: 100% (97/97), done.
+		remote: Total 135 (delta 77), reused 83 (delta 32), pack-reused 0
+		Receiving objects: 100% (135/135), 66.31 KiB | 1.70 MiB/s, done.
+		Resolving deltas: 100% (77/77), done.
+	```
+- Make sure go is installed and you have a similar version:
+	```shell
+	➜ go version
+	go version go1.18.3 darwin/amd64
+	```
+	For help installing and configuting go look [here](https://go.dev/doc/install)
+
+- Now lets make sure we have all required modules installed
+	```shell
+	➜ go mod tidy
+	```
+
+- Set up our local variables
+	```shell
+	export PORT="3000"
+	export GHTOKEN="ghp_MYTOKENISCOLLERTHANYOURS"
+	export WHSECRET="YOUSHOULDSEEMYSECRETTHO"
+	```
+
+- Finally we start our service
+	```shell
+	➜ go run main.go
+	INFO[0000] server started
+	```
+	Now that the server is up, let send a mock requet. We will use curl for this exercise but, you could use Postman or any other tool you choose.
+	```shell
+	➜ curl \
+	http://localhost:3000/test \
+	-H "Accept: application/json" \
+	-H "content-type: application/json" \
+	-d '{"action":"created", "repository":{"name": "readme_create", "owner": {"login":"automata-devops-io"}}, "sender": {"login": "sam1el"}},'
+
+	{"organization":"automata-devops-io","repos":[{"name":"readme_create","dependabot_vulnerability_alerts_enabled":true,"code_scanning_has_data":false,"branches":[{"name":"main","protected":true,"protection":{"enabled":true,"required_status_checks":{"enforcement_level":"on","contexts":[],"checks":[]}}}]}]}
+	```
+
 ### Microservice - Let's Deploy!
+
+Having verified we have the mimimum requirements met, we are going to deploy our microservice. For this step we will be using `Heroku` connected to our repo directly for deployments. You could also use Docker, Terraform, AWS, AZURE or, any other service that allows you a publicly accessible endpoint. [See Examples](examples)
+
+This repository is pushed to Heroku where Environment variables are passed to the application as `Config Vars`. You can do this via the cli or in the heroku interface. More information can be found setting up with go [here](https://devcenter.heroku.com/categories/go-support)
+
+Below is what it would look like on the heroku site.
+
+- Setting up variables
+
+	![link to heroku config](/images/heroku-config.png)
+
+
+- Configuring link to GitHub
+
+	![link heroku to repo](images/heroku-ghlink.png)
+
+  Once you have connected your repo to github, heroku will rebuild your service any time you push your code to main.
+
+  ```shell
+  ➜ git push -u origin main
+  ```
+
+- Verify your build in GitHub
+
+	![link to ghdeploy](/images/gh-deploy.png)
+
+- You can also visualize this in heroku
+
+	![link to heroku build](/images/heroku-build.png)
+
+	If click the `View build log` link you are presented with the following
+	```shell
+	-----> Building on the Heroku-20 stack
+	-----> Using buildpack: heroku/go
+	-----> Go app detected
+	-----> Fetching stdlib.sh.v8... done
+	----->
+		Detected go modules via go.mod
+	----->
+		Detected Module Name: github.com/automata-devops-io/go-repo-man
+	----->
+	-----> Using go1.18.3
+	-----> Determining packages to install
+		Detected the following main packages to install:
+		github.com/automata-devops-io/go-repo-man
+	-----> Running: go install -v -tags heroku github.com/automata-devops-io/go-repo-man
+		github.com/automata-devops-io/go-repo-man
+		Installed the following binaries:
+			./bin/go-repo-man
+	-----> Discovering process types
+		Procfile declares types -> web
+	-----> Compressing...
+		Done: 4.1M
+	-----> Launching...
+		Released v36
+		https://adevrepoman.herokuapp.com/ deployed to Heroku
+	```
+
+### Creating the Webhook
