@@ -55,6 +55,8 @@ We will also be creating the `main` branch and `Readme.md` as well as creating a
 
   - The `main` function creates our listening service using go's builtin `net/http` libraries with a function handler to communicate with the `go-github` library.
 
+	**Note**: The `/test` endpoint is only used for our testing. The webhook in GitHub will be using the `/webhook` endpoint. Our `/webhook` endpoint is expecting a `secret` to be configured for the webhook which was difficult to mock due to the way GitHub creates the secret header.
+
   ```go
 	func main() {
 		port := os.Getenv("PORT")
