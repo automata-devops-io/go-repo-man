@@ -56,12 +56,13 @@ We will also be creating the `main` branch and `Readme.md` as well as creating a
   - The `main` function creates our listening service using go's builtin `net/http` libraries with a function handler to communicate with the `go-github` library.
 
   ```go
-  func main() {
-	port := os.Getenv("PORT")
-	log.Println("server started")
-	http.HandleFunc("/test", repoMan)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
-  }
+	func main() {
+		port := os.Getenv("PORT")
+		log.Info("server started")
+		http.HandleFunc("/test", repoList)
+		http.HandleFunc("/webhook", repoMan)
+		log.Fatal(http.ListenAndServe(":"+port, nil))
+	}
   ```
 
   - the `repoMan` function parses the payload from our GitHub webhook, validates the type of event and, sends instructions back to the Github API based on the event type.
@@ -69,8 +70,6 @@ We will also be creating the `main` branch and `Readme.md` as well as creating a
   The first section handles client connection
   ```go
   func repoMan(w http.ResponseWriter, r *http.Request) {
-	ghtoken := os.Getenv("GHTOKEN")
-	whsecret := os.Getenv("WHSECRET")
 	ctx := context.Background()
 	// flag.Parse()
 	context := context.Background()
@@ -254,7 +253,7 @@ Now that we have the microservice deployed, we need to create the webhook to bri
 
 To set up your webhook you will need at minimum a `Payload URL`, `Content type` and to select your `Event types`. You can see below how it looks in Github
 
-![link to webhook creation](images/webhook-creation.png)
+![link to webhook creation](/images/webhook-creeation.png)
 
 As you can see, we have selected to have all events sent as we plant to expand upon this module but for now, you will want to select `Let me select individual events` and then check the box for `repositories`. We have also configured our webhook with a secret. This is what you will provide to the `WHSECRET` environment variable.
 
