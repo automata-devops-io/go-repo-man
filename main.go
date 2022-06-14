@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"net/http"
 	"os"
@@ -15,17 +16,41 @@ import (
 func main() {
 	port := os.Getenv("PORT")
 	log.Info("server started")
-	http.HandleFunc("/test", repoMan)
+	http.HandleFunc("/test", repoList)
+	http.HandleFunc("/repoMan", repoMan)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
 var (
-	org = flag.String("org", "automata-devops-io", "organization to target in github")
+	org      = flag.String("org", "automata-devops-io", "organization to target in github")
+	ghtoken  = os.Getenv("GHTOKEN")
+	whsecret = os.Getenv("WHSECRET")
 )
 
+func repoList(w http.ResponseWriter, r *http.Request) {
+	context := context.Background()
+	tokenService := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: ghtoken},
+	)
+	tokenClient := oauth2.NewClient(context, tokenService)
+
+	client := github.NewClient(tokenClient)
+	repoOpt := &github.RepositoryListByOrgOptions{Type: "all"}
+
+	repoList, _, err := client.Repositories.ListByOrg(context, *org, repoOpt)
+	for _, repo := range repoList {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(repoList[len(repoList)-1])
+		log.Printf("[DEBUG] Repo %s: %s\n", *repo.Owner.Login, *repo.Name)
+	}
+	if err != nil {
+		log.Printf("Problem in getting repository information %v\n", err)
+		os.Exit(1)
+	}
+}
+
 func repoMan(w http.ResponseWriter, r *http.Request) {
-	ghtoken := os.Getenv("GHTOKEN")
-	whsecret := os.Getenv("WHSECRET")
 	ctx := context.Background()
 	// flag.Parse()
 	context := context.Background()
@@ -38,14 +63,14 @@ func repoMan(w http.ResponseWriter, r *http.Request) {
 
 	payload, err := github.ValidatePayload(r, []byte(whsecret))
 	if err != nil {
-		log.Error("error validating request body: err", err)
+		log.Error("error validating request body:  ", err)
 		return
 	}
 	defer r.Body.Close()
 
 	event, err := github.ParseWebHook(github.WebHookType(r), payload)
 	if err != nil {
-		log.Error("could not parse webhook:", err)
+		log.Error("could not parse webhook: ", err)
 		return
 	}
 

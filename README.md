@@ -182,15 +182,11 @@ Now we're going run this locally and do some testing to make sure our microservi
 	➜ go run main.go
 	INFO[0000] server started
 	```
-	Now that the server is up, let send a mock requet. We will use curl for this exercise but, you could use Postman or any other tool you choose.
+	Now that the server is up lets hit our test endpoint which will return a list of repos. We will use curl for this exercise but, you could use Postman or any other tool you choose.
 	```shell
-	➜ curl \
-	http://localhost:3000/test \
-	-H "Accept: application/json" \
-	-H "content-type: application/json" \
-	-d '{"action":"created", "repository":{"name": "readme_create", "owner": {"login":"automata-devops-io"}}, "sender": {"login": "sam1el"}},'
+  ➜ curl http://localhost:3000/test
 
-	{"organization":"automata-devops-io","repos":[{"name":"readme_create","dependabot_vulnerability_alerts_enabled":true,"code_scanning_has_data":false,"branches":[{"name":"main","protected":true,"protection":{"enabled":true,"required_status_checks":{"enforcement_level":"on","contexts":[],"checks":[]}}}]}]}
+  {"id":503119585,"node_id":"R_kgDOHfz-4Q","owner":{"login":"automata-devops-io","id":107265107,"node_id":"O_kgDOBmS8Uw","avatar_url":"https://avatars.githubusercontent.com/u/107265107?v=4","html_url":"https://github.com/automata-devops-io","gravatar_id":"","type":"Organization","site_admin":false,"url":"https://api.github.com/users/automata-devops-io","events_url":"https://api.github.com/users/automata-devops-io/events{/privacy}","following_url":"https://api.github.com/users/automata-devops-io/following{/other_user}","followers_url":"https://api.github.com/users/automata-devops-io/followers","gists_url":"https://api.github.com/users/automata-devops-io/gists{/gist_id}","organizations_url":"https://api.github.com/users/automata-devops-io/orgs","received_events_url":"https://api.github.com/users/automata-devops-io/received_events","repos_url":"https://api.github.com/users/automata-devops-io/repos","starred_url":"https://api.github.com/users/automata-devops-io/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/automata-devops-io/subscriptions"}}
 	```
 
 ### Microservice - Let's Deploy!
