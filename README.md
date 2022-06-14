@@ -253,7 +253,7 @@ Now that we have the microservice deployed, we need to create the webhook to bri
 
 To set up your webhook you will need at minimum a `Payload URL`, `Content type` and to select your `Event types`. You can see below how it looks in Github
 
-![link to webhook creation](/images/webhook-creeation.png)
+![link to webhook creation](/images/webhook-creation.png)
 
 As you can see, we have selected to have all events sent as we plant to expand upon this module but for now, you will want to select `Let me select individual events` and then check the box for `repositories`. We have also configured our webhook with a secret. This is what you will provide to the `WHSECRET` environment variable.
 
