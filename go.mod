@@ -1,6 +1,6 @@
 module github.com/automata-devops-io/go-repo-man
 
-go 1.17
+go 1.18
 
 require (
 	github.com/google/go-github v17.0.0+incompatible
