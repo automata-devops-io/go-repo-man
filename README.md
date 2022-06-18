@@ -19,7 +19,7 @@
 
  As many companies are moving towards policy driven resource management, this project has been created as an example of how to manage your `Organizations` GitHub repositories as code. The microservice created serves 2 functions. The primary(main?) function is to act as an ingress point for your GitHub `Organizations` webhooks which notifies the `repoMan` function to secure your newly created repositories using `branch protection rules`. For more information on what rules are available click [here](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/managing-a-branch-protection-rule)
 
-For this project we are using a **GoLang** microservice as a notification ingress point for GitHub webhooks. Once a notification payload is received, we send a our `branch protection rules` with the GitHub REST [API](https://docs.github.com/en/rest) using the [GitHub REST API client for Golang](https://github.com/google/go-github) from [Google](https://github.com/google). Go was chosen for it's ability to be compact and compiled for any OS and eaze of containterization.
+For this project we are using a **GoLang** microservice as a notification ingress point for GitHub webhooks. Once a notification payload is received, we send our `branch protection rules` with the GitHub REST [API](https://docs.github.com/en/rest) using the [GitHub REST API client for Golang](https://github.com/google/go-github) from [Google](https://github.com/google). Go was chosen for it's ability to be compact and compiled for any OS and eaze of containterization.
 
 ## What's Needed?
 
