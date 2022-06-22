@@ -17,7 +17,7 @@ func main() {
 	port := os.Getenv("PORT")
 	log.Info("server started")
 	http.HandleFunc("/test", repoList)
-	http.HandleFunc("/repoMan", repoMan)
+	http.HandleFunc("/webhook", repoMan)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
